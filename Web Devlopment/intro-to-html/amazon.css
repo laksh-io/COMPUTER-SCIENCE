@@ -1,0 +1,53 @@
+
+.add-button{
+    background-color: rgb(250, 220, 72);
+
+    height: 30px;
+    width: 100px;
+    border: none;
+    color:black;
+    border-radius: 20px;
+    cursor:pointer;
+    margin-right: 9px;
+    font-size: 15px;
+    transition: background-color 0.5s,
+    color 1s;
+}.add-button:hover{
+    opacity:0.9;
+}.add-button:active{
+    opacity: 1;
+}
+.now-button:hover{
+    opacity: 0.9;
+}.now-button:active{
+    opacity: 1;
+}
+.amz{
+    transition: background-color 0.5s,
+    color 0.2s;
+}.amz:hover{
+    color:darkorange;
+} .now-button{
+    background-color: rgb(223, 124, 53);
+     height: 30px;
+     width:100px;
+    border: none;
+    color:black;
+    border-radius:20px;
+    cursor: pointer;
+    font-size:15px;
+    transition: background-color 0.89s,
+    color 0.1s;
+}.phone{
+    font-weight: bolder;
+    font-size: 30px;
+    cursor:pointer;
+
+
+}.phone:hover{
+   text-shadow: 4px 5px 5px rgba(0,0 ,0, 0.15);
+}
+.price{color:green;
+font-weight: bold;
+font-size: 20px;}
+.text{font-size: 19px;}

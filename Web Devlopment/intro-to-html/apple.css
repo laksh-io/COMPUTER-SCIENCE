@@ -1,0 +1,17 @@
+    .info{
+        font-family: arial;
+        margin-top:20;
+        font-size:20px;
+        background-color: rgb(224, 51, 51);
+        color:white;
+        line-height:20px;
+        text-align: center;
+        padding-top:20px;
+        padding-bottom:20px;
+    }
+    .a:hover{
+    text-decoration:underline;
+    cursor: pointer;
+    
+    }
+    

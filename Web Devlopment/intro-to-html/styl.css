@@ -1,0 +1,26 @@
+
+    p{
+        font-family:arial;
+    }
+.tit{
+    font-size:18px;
+    font-weight:bold;
+    width:300px;
+    line-height:23px;
+    margin-bottom:0;
+}.view{
+    color:rgb(96,96,96);
+    font-size:14px;
+    margin-top:3 ; 
+     line-height:2;
+}.br{
+    color:rgb(96,96,96);
+    font-size:15px;
+    
+}
+.phone{
+    font-size:14px;
+    color:rgb(96,96,96);
+    width:280px;
+    line-height:22px;
+}

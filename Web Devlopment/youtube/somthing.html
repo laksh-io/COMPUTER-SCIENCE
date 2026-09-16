@@ -1,0 +1,833 @@
+cat > /mnt/user-data/outputs/watchhub.html << 'ENDOFFILE'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>WatchHub – YouTube Clone</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f2f2f2;
+    --bg-tertiary: #f9f9f9;
+    --text-primary: #0f0f0f;
+    --text-secondary: #606060;
+    --border: rgba(0,0,0,0.12);
+    --border-hover: rgba(0,0,0,0.25);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-primary: #0f0f0f;
+      --bg-secondary: #272727;
+      --bg-tertiary: #181818;
+      --text-primary: #f1f1f1;
+      --text-secondary: #aaaaaa;
+      --border: rgba(255,255,255,0.12);
+      --border-hover: rgba(255,255,255,0.28);
+    }
+  }
+
+  body {
+    font-family: 'Roboto', Arial, sans-serif;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  #app { display: flex; flex-direction: column; height: 100vh; }
+
+  /* ── Header ── */
+  .yt-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px;
+    background: var(--bg-primary);
+    border-bottom: 0.5px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    height: 56px;
+  }
+  .yt-logo {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #ff0000;
+    white-space: nowrap;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .yt-logo i { font-size: 28px; }
+  .yt-logo span { color: var(--text-primary); }
+
+  .yt-search {
+    display: flex;
+    flex: 1;
+    max-width: 540px;
+    margin: 0 auto;
+  }
+  .yt-search input {
+    flex: 1;
+    height: 38px;
+    padding: 0 14px;
+    border: 0.5px solid var(--border);
+    border-right: none;
+    border-radius: 20px 0 0 20px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .yt-search input:focus { border-color: #3ea6ff; }
+  .yt-search button {
+    height: 38px;
+    padding: 0 18px;
+    border: 0.5px solid var(--border);
+    border-left: none;
+    border-radius: 0 20px 20px 0;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    transition: background 0.15s;
+  }
+  .yt-search button:hover { background: var(--border); }
+
+  .yt-header-right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
+  }
+  .icon-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    transition: background 0.15s;
+  }
+  .icon-btn:hover { background: var(--bg-secondary); }
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    background: #3c8af7;
+    color: #fff;
+    cursor: pointer;
+    margin-left: 4px;
+  }
+
+  /* ── Body ── */
+  .yt-body { display: flex; flex: 1; overflow: hidden; }
+
+  /* ── Sidebar ── */
+  .yt-sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    overflow-y: auto;
+    padding: 8px 0 24px;
+    background: var(--bg-primary);
+    border-right: 0.5px solid var(--border);
+  }
+  .yt-sidebar::-webkit-scrollbar { width: 6px; }
+  .yt-sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 13px;
+    border-radius: 10px;
+    margin: 0 8px 2px;
+    transition: background 0.12s;
+    user-select: none;
+  }
+  .sidebar-item:hover { background: var(--bg-secondary); }
+  .sidebar-item.active { background: var(--bg-secondary); font-weight: 600; }
+  .sidebar-item i { font-size: 20px; color: var(--text-secondary); flex-shrink: 0; }
+  .sidebar-item.active i { color: var(--text-primary); }
+
+  .sidebar-divider { height: 0.5px; background: var(--border); margin: 10px 0; }
+  .sidebar-section {
+    padding: 8px 20px 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+  }
+  .sub-dot { font-size: 20px; flex-shrink: 0; }
+
+  /* ── Main content ── */
+  .yt-main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 20px 32px;
+  }
+  .yt-main::-webkit-scrollbar { width: 6px; }
+  .yt-main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .chip-bar {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    margin-bottom: 18px;
+    padding-bottom: 2px;
+  }
+  .chip-bar::-webkit-scrollbar { height: 0; }
+  .chip {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    border: 0.5px solid var(--border);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background 0.12s;
+    user-select: none;
+  }
+  .chip:hover { background: var(--bg-secondary); }
+  .chip.active {
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    border-color: var(--text-primary);
+  }
+
+  /* ── Video Grid ── */
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 18px;
+  }
+  .video-card { cursor: pointer; }
+  .video-card:hover .thumb-overlay { opacity: 1; }
+  .video-card:focus { outline: 2px solid #3ea6ff; border-radius: 8px; }
+
+  .thumb-wrap {
+    position: relative;
+    aspect-ratio: 16/9;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    background: var(--bg-secondary);
+  }
+  .thumb-fake {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 44px;
+  }
+  .thumb-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .thumb-overlay i { font-size: 44px; color: #fff; }
+  .duration {
+    position: absolute;
+    bottom: 6px;
+    right: 6px;
+    background: rgba(0,0,0,0.85);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  .vid-meta { display: flex; gap: 10px; align-items: flex-start; }
+  .vid-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+  }
+  .vid-title {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+    margin-bottom: 3px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .vid-channel { font-size: 12px; color: var(--text-secondary); }
+  .vid-stats { font-size: 12px; color: var(--text-secondary); }
+
+  /* ── Player View ── */
+  .player-view {
+    display: none;
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 24px 32px;
+    gap: 24px;
+  }
+  .player-view.active { display: flex; }
+  .player-view::-webkit-scrollbar { width: 6px; }
+  .player-view::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .player-left { flex: 1; min-width: 0; }
+
+  .player-screen {
+    aspect-ratio: 16/9;
+    background: #000;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+    overflow: hidden;
+    position: relative;
+  }
+  .play-poster {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .play-poster-emoji { font-size: 72px; }
+  .play-btn-big {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.18);
+    border: 2px solid rgba(255,255,255,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    transition: background 0.15s;
+  }
+  .play-btn-big:hover { background: rgba(255,255,255,0.28); }
+  .play-btn-big i { font-size: 30px; margin-left: 4px; }
+
+  .player-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0 14px;
+  }
+  .progress-bar {
+    flex: 1;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    cursor: pointer;
+    position: relative;
+  }
+  .progress-bar:hover { height: 6px; }
+  .progress-fill { height: 100%; background: #ff0000; border-radius: 2px; width: 0%; transition: width 0.1s linear; }
+  .time-display { font-size: 12px; color: var(--text-secondary); min-width: 90px; text-align: right; }
+
+  .player-title { font-size: 18px; font-weight: 600; margin-bottom: 6px; line-height: 1.4; }
+  .player-stats-row { font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; }
+
+  .player-channel-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .channel-avatar-big {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+  }
+  .channel-name-big { font-size: 14px; font-weight: 600; }
+  .subs-count { font-size: 12px; color: var(--text-secondary); }
+  .subscribe-btn {
+    margin-left: auto;
+    padding: 9px 18px;
+    border-radius: 20px;
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .subscribe-btn:hover { opacity: 0.85; }
+
+  .action-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .action-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: 0.5px solid var(--border);
+    background: var(--bg-secondary);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: background 0.12s;
+    user-select: none;
+  }
+  .action-pill:hover { background: var(--border); }
+
+  .description-box {
+    background: var(--bg-secondary);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    cursor: pointer;
+  }
+  .description-box strong { color: var(--text-primary); }
+
+  /* ── Side Queue ── */
+  .player-right { width: 360px; flex-shrink: 0; }
+  .queue-label { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+
+  .queue-item {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    transition: background 0.12s;
+  }
+  .queue-item:hover { background: var(--bg-secondary); }
+  .queue-thumb {
+    width: 120px;
+    aspect-ratio: 16/9;
+    border-radius: 6px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    position: relative;
+    overflow: hidden;
+    background: var(--bg-secondary);
+  }
+  .queue-duration {
+    position: absolute;
+    bottom: 3px;
+    right: 3px;
+    background: rgba(0,0,0,0.85);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+  .queue-info { flex: 1; min-width: 0; }
+  .queue-title {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 3px;
+  }
+  .queue-channel { font-size: 12px; color: var(--text-secondary); }
+  .queue-stats { font-size: 12px; color: var(--text-secondary); }
+
+  /* ── Empty state ── */
+  .empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 0;
+    color: var(--text-secondary);
+    font-size: 15px;
+  }
+  .empty-state i { font-size: 48px; display: block; margin-bottom: 12px; opacity: 0.4; }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <!-- Header -->
+  <header class="yt-header">
+    <a class="yt-logo" onclick="showHome()" href="javascript:void(0)" aria-label="WatchHub home">
+      <i class="ti ti-brand-youtube" aria-hidden="true"></i>
+      <span>WatchHub</span>
+    </a>
+
+    <div class="yt-search" role="search">
+      <input type="text" id="search-input" placeholder="Search videos" aria-label="Search videos" />
+      <button onclick="doSearch()" aria-label="Submit search">
+        <i class="ti ti-search" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <div class="yt-header-right">
+      <button class="icon-btn" aria-label="Notifications"><i class="ti ti-bell" aria-hidden="true"></i></button>
+      <button class="icon-btn" aria-label="Upload video"><i class="ti ti-upload" aria-hidden="true"></i></button>
+      <div class="avatar" title="Your account" role="button" tabindex="0">U</div>
+    </div>
+  </header>
+
+  <div class="yt-body">
+    <!-- Sidebar -->
+    <nav class="yt-sidebar" aria-label="Main navigation">
+      <div class="sidebar-item active" id="nav-home" onclick="showHome()">
+        <i class="ti ti-home" aria-hidden="true"></i> Home
+      </div>
+      <div class="sidebar-item" onclick="alert('Shorts – coming soon!')">
+        <i class="ti ti-trending-up" aria-hidden="true"></i> Shorts
+      </div>
+      <div class="sidebar-item" onclick="alert('Subscriptions – coming soon!')">
+        <i class="ti ti-rss" aria-hidden="true"></i> Subscriptions
+      </div>
+
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">Library</div>
+
+      <div class="sidebar-item" onclick="alert('History – coming soon!')">
+        <i class="ti ti-clock" aria-hidden="true"></i> History
+      </div>
+      <div class="sidebar-item" onclick="alert('Watch Later – coming soon!')">
+        <i class="ti ti-bookmark" aria-hidden="true"></i> Watch later
+      </div>
+      <div class="sidebar-item" onclick="alert('Liked Videos – coming soon!')">
+        <i class="ti ti-thumb-up" aria-hidden="true"></i> Liked videos
+      </div>
+
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">Subscriptions</div>
+
+      <div class="sidebar-item"><i class="ti ti-circle-filled sub-dot" style="color:#e22" aria-hidden="true"></i> TechExplainer</div>
+      <div class="sidebar-item"><i class="ti ti-circle-filled sub-dot" style="color:#2a7" aria-hidden="true"></i> NatureWorld</div>
+      <div class="sidebar-item"><i class="ti ti-circle-filled sub-dot" style="color:#a2e" aria-hidden="true"></i> GameVault</div>
+      <div class="sidebar-item"><i class="ti ti-circle-filled sub-dot" style="color:#e72" aria-hidden="true"></i> CookMaster</div>
+      <div class="sidebar-item"><i class="ti ti-circle-filled sub-dot" style="color:#5af" aria-hidden="true"></i> MelodyLab</div>
+    </nav>
+
+    <!-- Home View -->
+    <main class="yt-main" id="home-view">
+      <div class="chip-bar" role="list" aria-label="Categories">
+        <div class="chip active" role="listitem" onclick="filterChip(this,'All')">All</div>
+        <div class="chip" role="listitem" onclick="filterChip(this,'Technology')">Technology</div>
+        <div class="chip" role="listitem" onclick="filterChip(this,'Gaming')">Gaming</div>
+        <div class="chip" role="listitem" onclick="filterChip(this,'Cooking')">Cooking</div>
+        <div class="chip" role="listitem" onclick="filterChip(this,'Nature')">Nature</div>
+        <div class="chip" role="listitem" onclick="filterChip(this,'Music')">Music</div>
+        <div class="chip" role="listitem" onclick="filterChip(this,'Sports')">Sports</div>
+        <div class="chip" role="listitem" onclick="filterChip(this,'News')">News</div>
+      </div>
+      <div class="video-grid" id="video-grid" role="list" aria-label="Videos"></div>
+    </main>
+
+    <!-- Player View -->
+    <div class="player-view" id="player-view" aria-label="Video player">
+      <div class="player-left">
+        <!-- Screen -->
+        <div class="player-screen" id="player-screen">
+          <div class="play-poster" id="play-poster" onclick="togglePlay()" role="button" tabindex="0" aria-label="Play or pause video">
+            <div class="play-poster-emoji" id="poster-emoji">🎬</div>
+            <div class="play-btn-big">
+              <i class="ti ti-player-play" id="play-icon" aria-hidden="true"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="player-controls">
+          <button class="icon-btn" onclick="togglePlay()" aria-label="Play/Pause">
+            <i class="ti ti-player-play" id="ctrl-play-icon" aria-hidden="true"></i>
+          </button>
+          <button class="icon-btn" aria-label="Skip forward">
+            <i class="ti ti-player-skip-forward" aria-hidden="true"></i>
+          </button>
+          <div class="progress-bar" id="progress-bar" onclick="seekVideo(event)" role="slider" aria-label="Video progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+          <span class="time-display" id="time-display">0:00 / 0:00</span>
+          <button class="icon-btn" aria-label="Fullscreen"><i class="ti ti-maximize" aria-hidden="true"></i></button>
+          <button class="icon-btn" aria-label="Settings"><i class="ti ti-settings" aria-hidden="true"></i></button>
+        </div>
+
+        <!-- Info -->
+        <div class="player-title" id="player-title">Video Title</div>
+        <div class="player-stats-row" id="player-stats">0 views</div>
+
+        <div class="player-channel-row">
+          <div class="channel-avatar-big" id="player-channel-avatar" style="background:#3c8af7">T</div>
+          <div>
+            <div class="channel-name-big" id="player-channel-name">Channel</div>
+            <div class="subs-count" id="player-subs">0 subscribers</div>
+          </div>
+          <button class="subscribe-btn" id="subscribe-btn" onclick="toggleSubscribe(this)">Subscribe</button>
+        </div>
+
+        <div class="action-row">
+          <div class="action-pill" onclick="toggleLike(this)">
+            <i class="ti ti-thumb-up" aria-hidden="true"></i>
+            <span id="likes-count">0</span>
+          </div>
+          <div class="action-pill"><i class="ti ti-thumb-down" aria-hidden="true"></i></div>
+          <div class="action-pill"><i class="ti ti-share" aria-hidden="true"></i> Share</div>
+          <div class="action-pill"><i class="ti ti-bookmark" aria-hidden="true"></i> Save</div>
+          <div class="action-pill"><i class="ti ti-dots" aria-hidden="true"></i></div>
+        </div>
+
+        <div class="description-box" id="player-desc">Description</div>
+      </div>
+
+      <!-- Queue -->
+      <div class="player-right">
+        <div class="queue-label">Up next</div>
+        <div id="queue-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const VIDEOS = [
+  { id:1,  emoji:"💻", title:"I Rewrote My Entire App in Rust — Here's What Happened",           channel:"TechExplainer", avatar:"#e22", views:"3.2M views", age:"2 days ago",    duration:"18:42",   likes:"98K",  subs:"1.1M", category:"Technology", desc:"After months of planning, I finally rewrote my production app in Rust. The results were shocking — both good and bad. Come along for the full journey.", bg:"#1a1a2e" },
+  { id:2,  emoji:"🌿", title:"Amazon Rainforest: Hidden Creatures You've Never Seen",            channel:"NatureWorld",   avatar:"#2a7", views:"8.5M views", age:"1 week ago",   duration:"24:15",   likes:"412K", subs:"4.8M", category:"Nature",     desc:"Deep in the Amazon, we discovered species that have never been filmed before. This 3-month expedition changed everything we knew about biodiversity.", bg:"#1a2e1a" },
+  { id:3,  emoji:"🎮", title:"Playing the Most Impossible RPG Ever Made for 24 Hours",          channel:"GameVault",     avatar:"#a2e", views:"1.7M views", age:"4 days ago",   duration:"1:02:33", likes:"87K",  subs:"2.3M", category:"Gaming",     desc:"Someone dared me to beat this legendary impossibly hard RPG in one sitting. 24 hours later, I regret everything. Also I won.", bg:"#1e1a2e" },
+  { id:4,  emoji:"🍜", title:"Making Ramen From Absolute Scratch (72 Hour Recipe)",              channel:"CookMaster",    avatar:"#e72", views:"5.1M views", age:"3 weeks ago",  duration:"32:08",   likes:"241K", subs:"3.2M", category:"Cooking",    desc:"Proper ramen takes days. Every element from pork bones to noodles made entirely from scratch. The most ambitious recipe on this channel.", bg:"#2e1e1a" },
+  { id:5,  emoji:"🚀", title:"How SpaceX Actually Gets Rockets to Land Themselves",              channel:"TechExplainer", avatar:"#e22", views:"12M views",  age:"1 month ago",  duration:"15:20",   likes:"563K", subs:"1.1M", category:"Technology", desc:"The grid fins, the Merlin engines, the autonomous drone ship — we break down every single system that makes propulsive landing work.", bg:"#0d0d1f" },
+  { id:6,  emoji:"🎵", title:"I Composed a Full Orchestra Piece Using Only AI Suggestions",     channel:"MelodyLab",     avatar:"#5af", views:"892K views", age:"6 days ago",   duration:"11:47",   likes:"44K",  subs:"380K", category:"Music",      desc:"What happens when you let an AI co-write a full orchestral composition? More interesting than I expected. Performed by a real ensemble.", bg:"#1a1a2e" },
+  { id:7,  emoji:"⚽", title:"Every Goal from the 2024 Champions League — Ranked",              channel:"FootballArena", avatar:"#e44", views:"22M views",  age:"2 months ago", duration:"28:55",   likes:"1.1M", subs:"9.2M", category:"Sports",     desc:"We ranked every single goal from last season's Champions League from worst to best. Spoiler: the top 10 are absolutely unreal.", bg:"#2e1a1a" },
+  { id:8,  emoji:"🌊", title:"Living Off-Grid on a Tiny Pacific Island for 30 Days",            channel:"NatureWorld",   avatar:"#2a7", views:"4.3M views", age:"3 months ago", duration:"41:22",   likes:"198K", subs:"4.8M", category:"Nature",     desc:"No phone, no electricity, no modern convenience. Just me, a small island, and everything nature provides. Here's what 30 days taught me.", bg:"#0d1f2e" },
+  { id:9,  emoji:"🤖", title:"GPT-5 vs Claude vs Gemini: The Ultimate Coding Test",             channel:"TechExplainer", avatar:"#e22", views:"6.8M views", age:"5 days ago",   duration:"22:11",   likes:"312K", subs:"1.1M", category:"Technology", desc:"I gave the same 50 programming challenges to the top AI models and scored every output. The results are genuinely surprising.", bg:"#1a1a2e" },
+  { id:10, emoji:"🍕", title:"Ranking Every NYC Pizza Style — Blind Taste Test",                channel:"CookMaster",    avatar:"#e72", views:"2.9M views", age:"2 weeks ago",  duration:"19:30",   likes:"134K", subs:"3.2M", category:"Cooking",    desc:"From thin Neapolitan to thick Sicilian, grandma slices to dollar slices — we tried 40 types of NYC pizza in one brutal afternoon.", bg:"#2e1e1a" },
+  { id:11, emoji:"🎯", title:"I Made a AAA Game Alone in 6 Months — Full Documentary",         channel:"GameVault",     avatar:"#a2e", views:"9.2M views", age:"3 weeks ago",  duration:"47:05",   likes:"480K", subs:"2.3M", category:"Gaming",     desc:"One person, six months, zero help. What does it take to ship a polished game completely solo? This is the full story.", bg:"#1e1a2e" },
+  { id:12, emoji:"🌌", title:"James Webb Telescope Just Changed Everything We Knew",            channel:"CosmosToday",   avatar:"#59f", views:"14.7M views",age:"1 week ago",   duration:"16:48",   likes:"701K", subs:"6.1M", category:"Technology", desc:"The latest batch of Webb images have broken multiple cosmological models. Here's exactly what scientists found and what it means.", bg:"#0d0d1f" },
+  { id:13, emoji:"🎸", title:"Learning Guitar From Zero to First Gig in 90 Days",               channel:"MelodyLab",     avatar:"#5af", views:"3.4M views", age:"5 weeks ago",  duration:"29:14",   likes:"177K", subs:"380K", category:"Music",      desc:"I picked up a guitar for the first time and documented every step to performing live. This is the honest, uncut version.", bg:"#1a1a2e" },
+  { id:14, emoji:"🧠", title:"How Your Brain Deletes Memories While You Sleep",                 channel:"CosmosToday",   avatar:"#59f", views:"18.2M views",age:"2 weeks ago",  duration:"14:55",   likes:"893K", subs:"6.1M", category:"Technology", desc:"New neuroscience research reveals why sleep isn't passive — your brain is actively pruning and consolidating memories all night.", bg:"#0d0d1f" },
+  { id:15, emoji:"🏋️", title:"I Trained Like an Olympic Athlete for 30 Days",                  channel:"FootballArena", avatar:"#e44", views:"7.1M views", age:"1 month ago",  duration:"36:40",   likes:"328K", subs:"9.2M", category:"Sports",     desc:"I hired an Olympic-level strength coach and followed an elite training program exactly as written for a full month. Here's what happened.", bg:"#2e1a1a" },
+];
+
+let currentCategory = 'All';
+let playing = false;
+let progressInterval = null;
+let currentProgress = 0;
+
+function renderGrid(videos) {
+  const grid = document.getElementById('video-grid');
+  if (!videos.length) {
+    grid.innerHTML = '<div class="empty-state"><i class="ti ti-mood-sad" aria-hidden="true"></i>No results found</div>';
+    return;
+  }
+  grid.innerHTML = videos.map(v => `
+    <div class="video-card" onclick="openVideo(${v.id})" role="listitem" tabindex="0"
+         onkeydown="if(event.key==='Enter')openVideo(${v.id})" aria-label="Watch: ${v.title}">
+      <div class="thumb-wrap">
+        <div class="thumb-fake" style="background:${v.bg}">${v.emoji}</div>
+        <div class="thumb-overlay" aria-hidden="true"><i class="ti ti-player-play"></i></div>
+        <div class="duration">${v.duration}</div>
+      </div>
+      <div class="vid-meta">
+        <div class="vid-avatar" style="background:${v.avatar}" aria-hidden="true">${v.channel[0]}</div>
+        <div>
+          <div class="vid-title">${v.title}</div>
+          <div class="vid-channel">${v.channel}</div>
+          <div class="vid-stats">${v.views} · ${v.age}</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterChip(el, cat) {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  currentCategory = cat;
+  const filtered = cat === 'All' ? VIDEOS : VIDEOS.filter(v => v.category === cat);
+  renderGrid(filtered);
+}
+
+function doSearch() {
+  const q = document.getElementById('search-input').value.trim().toLowerCase();
+  showHome();
+  if (!q) { renderGrid(VIDEOS); return; }
+  const results = VIDEOS.filter(v =>
+    v.title.toLowerCase().includes(q) ||
+    v.channel.toLowerCase().includes(q) ||
+    v.category.toLowerCase().includes(q)
+  );
+  renderGrid(results);
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+}
+
+function openVideo(id) {
+  const v = VIDEOS.find(x => x.id === id);
+  if (!v) return;
+
+  document.getElementById('home-view').style.display = 'none';
+  const pv = document.getElementById('player-view');
+  pv.style.display = 'flex';
+  pv.classList.add('active');
+  pv.scrollTop = 0;
+
+  document.getElementById('nav-home').classList.remove('active');
+
+  document.getElementById('poster-emoji').textContent = v.emoji;
+  document.getElementById('play-poster').style.background = v.bg;
+  document.getElementById('play-poster').style.opacity = '1';
+  document.getElementById('player-title').textContent = v.title;
+  document.getElementById('player-stats').textContent = v.views + ' · ' + v.age;
+  document.getElementById('player-channel-name').textContent = v.channel;
+  document.getElementById('player-subs').textContent = v.subs + ' subscribers';
+  const ca = document.getElementById('player-channel-avatar');
+  ca.style.background = v.avatar;
+  ca.textContent = v.channel[0];
+  document.getElementById('likes-count').textContent = v.likes;
+  document.getElementById('player-desc').innerHTML =
+    `<strong>${v.age} · ${v.views}</strong><br><br>${v.desc}`;
+  document.getElementById('time-display').textContent = '0:00 / ' + v.duration;
+  document.getElementById('subscribe-btn').textContent = 'Subscribe';
+  document.getElementById('subscribe-btn').style.background = '';
+
+  stopProgress();
+  currentProgress = 0;
+  document.getElementById('progress-fill').style.width = '0%';
+  playing = false;
+  document.getElementById('play-icon').className = 'ti ti-player-play';
+  document.getElementById('ctrl-play-icon').className = 'ti ti-player-play';
+
+  const others = VIDEOS.filter(x => x.id !== id);
+  document.getElementById('queue-list').innerHTML = others.map(x => `
+    <div class="queue-item" onclick="openVideo(${x.id})" role="button" tabindex="0"
+         onkeydown="if(event.key==='Enter')openVideo(${x.id})">
+      <div class="queue-thumb" style="background:${x.bg}">${x.emoji}
+        <div class="queue-duration">${x.duration}</div>
+      </div>
+      <div class="queue-info">
+        <div class="queue-title">${x.title}</div>
+        <div class="queue-channel">${x.channel}</div>
+        <div class="queue-stats">${x.views} · ${x.age}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function showHome() {
+  document.getElementById('home-view').style.display = '';
+  const pv = document.getElementById('player-view');
+  pv.style.display = 'none';
+  pv.classList.remove('active');
+  document.getElementById('nav-home').classList.add('active');
+  stopProgress();
+  playing = false;
+}
+
+function togglePlay() {
+  playing = !playing;
+  const pi = document.getElementById('play-icon');
+  const ci = document.getElementById('ctrl-play-icon');
+  if (playing) {
+    pi.className = 'ti ti-player-pause';
+    ci.className = 'ti ti-player-pause';
+    document.getElementById('play-poster').style.opacity = '0.35';
+    startProgress();
+  } else {
+    pi.className = 'ti ti-player-play';
+    ci.className = 'ti ti-player-play';
+    document.getElementById('play-poster').style.opacity = '1';
+    stopProgress();
+  }
+}
+
+function startProgress() {
+  stopProgress();
+  progressInterval = setInterval(() => {
+    if (!playing) { stopProgress(); return; }
+    currentProgress = Math.min(currentProgress + 0.07, 100);
+    document.getElementById('progress-fill').style.width = currentProgress + '%';
+    if (currentProgress >= 100) {
+      stopProgress();
+      playing = false;
+      document.getElementById('play-icon').className = 'ti ti-player-play';
+      document.getElementById('ctrl-play-icon').className = 'ti ti-player-play';
+      document.getElementById('play-poster').style.opacity = '1';
+    }
+  }, 50);
+}
+
+function stopProgress() {
+  if (progressInterval) { clearInterval(progressInterval); progressInterval = null; }
+}
+
+function seekVideo(e) {
+  const bar = e.currentTarget;
+  const pct = Math.max(0, Math.min(100, (e.offsetX / bar.offsetWidth) * 100));
+  currentProgress = pct;
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+function toggleLike(el) {
+  el.style.background = el.dataset.liked ? '' : 'var(--bg-tertiary)';
+  el.dataset.liked = el.dataset.liked ? '' : '1';
+}
+
+function toggleSubscribe(btn) {
+  const subscribed = btn.textContent === 'Subscribed';
+  btn.textContent = subscribed ? 'Subscribe' : 'Subscribed';
+  btn.style.background = subscribed ? '' : '#606060';
+}
+
+document.getElementById('search-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doSearch();
+});
+
+renderGrid(VIDEOS);
+</script>
+</body>
+</html>
+ENDOFFILE
+echo "Done"
