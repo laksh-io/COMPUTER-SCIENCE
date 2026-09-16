@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laksh Vats</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F3F1EA;
+    --ink: #161615;
+    --ink-soft: #6B6862;
+    --line: #D4D0C4;
+    --red: #D2401F;
+    --dot: #C8C3B4;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #171613;
+      --ink: #F0EEE6;
+      --ink-soft: #8E8B82;
+      --line: #35332C;
+      --red: #E6572E;
+      --dot: #35332C;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #171613;
+    --ink: #F0EEE6;
+    --ink-soft: #8E8B82;
+    --line: #35332C;
+    --red: #E6572E;
+    --dot: #35332C;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); }
+  body {
+    font-family: 'Space Mono', ui-monospace, 'SFMono-Regular', Consolas, monospace;
+    line-height: 1.6;
+    background-image: radial-gradient(var(--dot) 1px, transparent 1px);
+    background-size: 22px 22px;
+    background-position: -11px -11px;
+  }
+  a { color: inherit; text-decoration: none; }
+  ::selection { background: var(--red); color: var(--bg); }
+
+  .display {
+    font-family: 'Silkscreen', 'Space Mono', monospace;
+  }
+
+  .wrap {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ---------- Nav ---------- */
+  nav .wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 22px 24px;
+  }
+  nav {
+    background: var(--bg);
+    border-bottom: 1px dashed var(--line);
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    letter-spacing: 0.02em;
+  }
+  .brand .led {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--red);
+    display: inline-block;
+  }
+  nav ul {
+    list-style: none;
+    display: flex;
+    gap: 22px;
+    margin: 0;
+    padding: 0;
+  }
+  nav a { font-size: 0.8rem; color: var(--ink-soft); }
+  nav a:hover { color: var(--red); }
+
+  /* ---------- Hero ---------- */
+  header.hero {
+    padding: 90px 0 64px;
+    border-bottom: 1px dashed var(--line);
+  }
+  header.hero .idx {
+    font-size: 0.75rem;
+    color: var(--ink-soft);
+    margin: 0 0 28px;
+  }
+  header.hero .idx .red { color: var(--red); }
+  header.hero h1 {
+    font-family: 'Silkscreen', monospace;
+    font-weight: 400;
+    font-size: clamp(1.8rem, 6vw, 2.7rem);
+    line-height: 1.35;
+    letter-spacing: 0.01em;
+    margin: 0 0 26px;
+    max-width: 11ch;
+  }
+  header.hero p.lede {
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+    max-width: 46ch;
+    margin: 0;
+  }
+
+  /* ---------- Section shell ---------- */
+  section {
+    padding: 50px 0;
+    border-bottom: 1px dashed var(--line);
+  }
+  section .tag {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    margin: 0 0 30px;
+  }
+  section .tag .n { color: var(--red); }
+  section .tag::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+
+  /* ---------- About ---------- */
+  .about-text {
+    max-width: 56ch;
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    margin: 0 0 34px;
+  }
+  .spec-table {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 10px 24px;
+    font-size: 0.85rem;
+  }
+  .spec-table dt { color: var(--ink-soft); }
+  .spec-table dd { margin: 0; }
+  .spec-table dd .yes { color: var(--ink); }
+  .spec-table dd .learning::before {
+    content: "○ ";
+    color: var(--red);
+  }
+  .spec-table dd .learning { color: var(--ink-soft); }
+  .spec-table dd span + span { margin-left: 14px; }
+
+  /* ---------- Projects ---------- */
+  .project {
+    padding: 26px 0;
+    border-top: 1px dashed var(--line);
+  }
+  .project:first-of-type { border-top: none; padding-top: 0; }
+  .project-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 10px;
+  }
+  .project h3 {
+    font-family: 'Silkscreen', monospace;
+    font-weight: 400;
+    font-size: 0.95rem;
+    margin: 0;
+  }
+  .project .num {
+    font-size: 0.75rem;
+    color: var(--red);
+  }
+  .project p {
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    margin: 0 0 14px;
+    max-width: 54ch;
+  }
+  .project .links {
+    display: flex;
+    gap: 20px;
+  }
+  .project .links a {
+    font-size: 0.78rem;
+    border-bottom: 1px solid var(--red);
+    padding-bottom: 2px;
+  }
+  .project .links a:hover { color: var(--red); }
+  .project.placeholder p { font-style: italic; }
+  .project.placeholder h3 { color: var(--ink-soft); }
+
+  /* ---------- Contact ---------- */
+  .contact-list a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-top: 1px dashed var(--line);
+    font-size: 0.9rem;
+  }
+  .contact-list a:first-child { border-top: none; }
+  .contact-list a:hover { color: var(--red); }
+  .contact-list .label {
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+  }
+
+  footer {
+    padding: 36px 0 56px;
+  }
+  footer .wrap {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    header.hero h1 { animation: fadeUp 0.6s ease-out; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <span class="brand"><span class="led"></span>LAKSH · VATS</span>
+    <ul>
+      <li><a href="#about">about</a></li>
+      <li><a href="#projects">projects</a></li>
+      <li><a href="#contact">contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="idx">[ <span class="red">●</span> developer profile / 01 ]</p>
+    <h1 class="display">LAKSH<br>VATS</h1>
+    <p class="lede">I build with HTML and CSS, and I'm working through the fundamentals of C, Python, and Java. Here's what I've made so far.</p>
+  </div>
+</header>
+
+<section id="about">
+  <div class="wrap">
+    <p class="tag">about</p>
+    <p class="about-text">I'm early in my coding journey. HTML and CSS are where I'm most comfortable — laying out a page, styling components, getting hover states and shadows to feel right. Alongside that I'm learning the basics of C, Python, and Java: loops, data types, and the kind of small exercises that build up to real projects.</p>
+    <dl class="spec-table">
+      <dt>building with</dt>
+      <dd><span class="yes">HTML</span><span class="yes">CSS</span></dd>
+      <dt>learning</dt>
+      <dd><span class="learning">C</span><span class="learning">Python</span><span class="learning">Java</span></dd>
+    </dl>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="wrap">
+    <p class="tag"><span class="n">-</span> projects</p>
+
+    <div class="project">
+      <div class="project-head">
+        <h3 class="display">Profile Card UI</h3>
+        <span class="num">01</span>
+      </div>
+      <p>A set of social-style profile cards — rounded corners, layered box-shadows, and hover/active states on the buttons. Built to practice component layout with plain CSS, no frameworks.</p>
+      <div class="links">
+        <a href="https://laksh-io.github.io/Web-Devlopment/anime.html" target="_blank" rel="noopener">view project</a>
+        <a href="https://github.com/laksh-io/Web-Devlopment/blob/main/anime.html" target="_blank" rel="noopener">view code</a>
+      </div>
+    </div>
+
+    <div class="project">
+      <div class="project-head">
+        <h3 class="display">instagram suggestions</h3>
+        <span class="num">02</span>
+      </div>
+      <p>A small practice piece on shaping and sizing images with border-radius and constrained widths.</p>
+      <div class="links">
+        <a href="https://laksh-io.github.io/Web-Devlopment/youtube/practice/ig.html" target="_blank" rel="noopener">view project</a>
+        <a href="https://github.com/laksh-io/Web-Devlopment/blob/main/youtube/practice/ig.html" target="_blank" rel="noopener">view code</a>
+      </div>
+    </div>
+
+    <div class="project">
+      <div class="project-head">
+        <h3 class="display">youtube home page</h3>
+        <span class="num">03</span>
+      </div>
+      <p>A YouTube homepage clone created with HTML and CSS to practice frontend development, layouts, and responsive design.
+ </p>
+ <div class ="links">
+  <a href="https://laksh-io.github.io/Web-Devlopment/youtube/yt.html" target="_blank" rel="noopener">view project</a>
+ <a href="https://github.com/laksh-io/Web-Devlopment/blob/main/youtube/yt.html" target="_blank" rel="noopener">view code</a>
+</div>
+
+<div class="project">
+      <div class="project-head">
+        <h3 class="display">age verification</h3>
+        <span class="num">04</span>
+      </div>
+      <p>A clean Age Verification interface built with HTML and CSS to practice frontend design, layouts, and user interaction.
+
+ </p>
+ <div class ="links">
+  <a href="https://laksh-io.github.io/Web-Devlopment/new/hub.html" target="_blank" rel="noopener">view project</a>
+ <a href="https://github.com/laksh-io/Web-Devlopment/blob/main/new/hub.html" target="_blank" rel="noopener">view code</a>
+</div>
+
+<div class="project">
+      <div class="project-head">
+        <h3 class="display">Inbox</h3>
+        <span class="num">05</span>
+      </div>
+      <p>practice indox of gmail with some css and html .
+
+ </p>
+ <div class ="links">
+  <a href="https://laksh-io.github.io/Web-Devlopment/youtube/inbox.html" target="_blank" rel="noopener">view project</a>
+ <a href="https://github.com/laksh-io/Web-Devlopment/blob/main/youtube/inbox.html" target="_blank" rel="noopener">view code</a>
+</div>
+
+
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap">
+    <p class="tag"><span class="n">-</span> contact</p>
+    <div class="contact-list">
+      <a href="mailto:vats.laksh511@gmail.com">
+        <span>vats.laksh511@gmail.com</span>
+        <span class="label">email</span>
+      </a>
+      <a href="https://github.com/laksh-io" target="_blank" rel="noopener">
+        <span>laksh-io</span>
+        <span class="label">github</span>
+      </a>
+      <a href="https://www.linkedin.com/in/laksh-vats-944162315" target="_blank" rel="noopener">
+        <span>laksh-vats</span>
+        <span class="label">linkedin</span>
+      </a>
+      <a href="https://instagram.com/lakshhvats" target="_blank" rel="noopener">
+        <span>lakshhvats</span>
+        <span class="label">instagram</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>meow <3</span>
+  
+  </div>
+</footer>
+
+</body>
+</html>
