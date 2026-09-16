@@ -4,5 +4,3 @@ age=  19
 price ="not for sale"
 print(name,age,price) 
 print(type(price))
-
-a = None
